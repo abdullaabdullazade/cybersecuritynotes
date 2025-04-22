@@ -1,14 +1,22 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const files = [
-  'Networking.md',
-  'Cryptography.md',
-  'Osint.md',
-  'Privilege Escalation.md',
-  'Steganography.md',
-];
-
 export default function App() {
+  const [files, setFiles] = useState([]);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch("https://cybernotesbackend.vercel.app/files")
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Fayllar tapılmadı");
+        const data = await response.json();
+        setFiles(data);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  }, []);
+
   return (
     <div className="h-screen w-screen bg-[#0f0f1a] text-cyan-100 font-mono flex items-center justify-center">
       <div className="p-6 bg-[#101124] rounded-lg shadow-lg border border-cyan-900 w-full max-w-md max-h-[90vh] flex flex-col items-center">
@@ -20,6 +28,10 @@ export default function App() {
         </p>
 
         <div className="overflow-y-auto w-full scrollbar-thin scrollbar-thumb-cyan-800 scrollbar-track-transparent pr-1 flex-1">
+          {error && (
+            <p className="text-red-400 text-center">{error}</p>
+          )}
+
           <ul className="space-y-2">
             {files.map((file, index) => (
               <li key={file + index}>
